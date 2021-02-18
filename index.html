@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+</head>
+
+
+<body>
+<div style="margin-left:30px; margin-top:30px">
+Chose an image: 
+<label for="file-upload" class="custom-file-upload">
+Upload
+</label>
+<input id="file-upload" type="file"/><br>
+</div>
+<canvas id=c style="display:none"></canvas>
+<p id="content">
+
+</p>
+<script src="jsQR.js"></script>
+<script>
+
+  
+  try {
+  
+    document.getElementById("file-upload").onchange = function(e) {
+
+      var file = e.target.files[0],                  // reference first file BLOB
+          url = URL.createObjectURL(file),           // create an Object URL
+          img = new Image();                         // create a temp. image object
+        
+        img.onload = function() {                    // handle async image loading
+          URL.revokeObjectURL(this.src);             // free memory held by Object URL
+          
+          c.width = img.width;
+          c.height = img.height;
+          c.getContext("2d").drawImage(this, 0, 0);  // draw image onto canvas (lazy method™)
+                                     // start convertion file to image
+        
+          var imageData = c.getContext("2d").getImageData(0, 0, c.width, c.height)
+          
+          var code = jsQR(imageData.data, imageData.width, imageData.height);
+
+          if (code) {
+            document.getElementById("content").innerHTML = code.data;
+            
+
+          }
+        };
+        img.src = url;   
+        
+    };
+  } catch (e) {
+    document.getElementById("content").innerHTML = e;
+  }
+
+</script>
+<style>
+input[type="file"] {
+    display: none;
+}
+.custom-file-upload {
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+</style>
+
+</body>
+</html>
